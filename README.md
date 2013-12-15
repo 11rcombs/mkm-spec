@@ -17,7 +17,7 @@ Ordered Chapter Overview
 
 MKV ordered chapters allow an MKV file to reference other MKV files, which can
 contain parts of the timeline, often to help de-duplicate video and audio data
-across multiple episodes in a series; it's perhaps best-known for its use in
+across multiple episodes in a series; it is perhaps best known for its use in
 fansubbed anime.
 
 Unfortunately, the ordered chapters specification only includes the UUID of
@@ -54,7 +54,7 @@ A file without a *base* specified can only be used in the latter case, but a fil
 
 Index Behavior
 --------------
-When loading any Matroska file, a player may optionally attempt to read and parse a file named "index.mkm" from the same directory as the MKV. This file does not replace a manifest path provided by the user, but can be used in addition to one. This behavior is meant to allow any MKV file in the same directory to be opened normally by the user, while still allowing exa ternal chapter files to be found easily by the player.
+When loading any Matroska file, a player may optionally attempt to read and parse a file named "index.mkm" from the same directory as the MKV. This file does not replace a manifest path provided by the user, but can be used in addition to one. This behavior is meant to allow any MKV file in the same directory to be opened normally by the user, while still allowing external chapter files to be found easily by the player.
 
 Format Example
 --------------
