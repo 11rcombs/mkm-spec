@@ -84,7 +84,6 @@ General points
 - This specification will attempt to prevent any ambiguities from being possible in MKM files, but if the parser detects a situation where correct behavior is not defined by this document, it MUST stop parsing immediately and fall back to playing the base file with dependencies resolved using the player's default internal mechanism. If the error occurs before the base file has been specified, the player MUST refuse to play any media corresponding to the MKM document being parsed. The default behavior being a hard failure is meant to discourage loosely-correct files that may play correctly in one compliant player, but not in another
 - If out-of-band metadata, such as HTTP headers, specifies a character encoding for an MKM file, this data MUST be ignored. Compliant MKM files are always encoded in UTF-8
 - If a path specified in an MKM file includes an ASCII space, tab, line feed, or hash ('#') character, it MUST be URL-encoded (e.g. '%20')
-- Lines in MKM files are always separated by newline characters. Carriage return characters will not be interpreted as "special" or "whitespace" characters
 - MKM parsing is case-sensitive
 - If a relative path must be resolved relative to *base*, and *base* is null, abort parsing.
 
@@ -100,10 +99,10 @@ The following steps are followed by a player in order to parse an MKM file:
 6. Let *input* be the decoded text of the manifest's byte stream.
 7. Let *position* be a pointer into input, initially pointing at the first character.
 8. If the characters starting from *position* are "MATROSKA", followed by a U+0020 SPACE character, followed by "MANIFEST", then advance *position* to the next character after those. Otherwise, this isn't a Matroska manifest: if the base file's URL is already known, play that file, resolving dependencies using the player's internal method; otherwise, treat the error like an unparseable or corrupted playlist or media file; abort this algorithm.
-9. If the character at *position* is neither a U+0020 SPACE character, a U+0009 CHARACTER TABULATION (tab) character, nor a U+000A LINE FEED (LF) character, then this isn't a Matroska manifest; abort this algorithm as specified above.
-10. Collect a sequence of characters that are not U+000A LINE FEED (LF) characters, and ignore those characters. (Extra text on the first line, after the signature, is ignored.)
-11. *Start of line*: If position is past the end of input, then jump to the last step. Otherwise, collect a sequence of characters that are U+000A LINE FEED (LF), U+0020 SPACE, or U+0009 CHARACTER TABULATION (tab) characters, and ignore those characters.
-12. Now, collect a sequence of characters that are *not* U+000A LINE FEED (LF) characters, and let the result be *line*.
+9. If the character at *position* is neither a U+0020 SPACE character, a U+0009 CHARACTER TABULATION (tab) character, a U+000D CARRIAGE RETURN (CR), nor a U+000A LINE FEED (LF) character, then this isn't a Matroska manifest; abort this algorithm as specified above.
+10. Collect a sequence of characters that are not U+000A LINE FEED (LF) or U+000D CARRIAGE RETURN (CR) characters, and ignore those characters. (Extra text on the first line, after the signature, is ignored.)
+11. *Start of line*: If position is past the end of input, then jump to the last step. Otherwise, collect a sequence of characters that are U+000A LINE FEED (LF), U+000D CARRIAGE RETURN (CR), U+0020 SPACE, or U+0009 CHARACTER TABULATION (tab) characters, and ignore those characters.
+12. Now, collect a sequence of characters that are *not* U+000A LINE FEED (LF) or U+000D CARRIAGE RETURN (CR) characters, and let the result be *line*.
 13. If *line* contains a U+0023 NUMBER SIGN character, drop the portion of *line* from the first NUMBER SIGN character to the end.
 14. Drop any trailing U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters at the end of *line*.
 15. If *line* is the empty string, then jump back to the *step* labeled "start of line".
