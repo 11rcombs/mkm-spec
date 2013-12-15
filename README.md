@@ -87,6 +87,33 @@ General points
 - MKM parsing is case-sensitive
 - If a relative path must be resolved relative to *base*, and *base* is null, abort parsing.
 
+EBNF Syntax
+-----------
+	manifest = 'MATROSKA MANIFEST', [ whitespace, [ text ] ],
+	         { line break }, [ { line, { line break } } ], [ line ] ;
+	line = [ base line | mode line | segment line | include line | text ], [ whitespace ], [ comment ] ;
+	base line = 'base', whitespace, URL ;
+	mode line = 'mode', whitespace, mode name, whitespace, mode value ;
+	segment line = 'segment', whitespace, URL, [ whitespace, hex string, [ whitespace, text ] ] ;
+	include line = 'include', whitespace, URL ;
+	
+	URL = { non whitespace character } ; (* needs work? *)
+	mode name = { non whitespace character } ;
+	mode value = { non whitespace character } ;
+	
+	hex character = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+	              | "A" | "B" | "C" | "D" | "E" | "F" ;
+	hex string = { hex character } ;
+	
+	line break character = ? Unicode character U+000A ? | ? Unicode character U+000D ? ;
+	line break = { line break character } ;
+	whitespace character = ? Unicode character U+0032 ? | ? Unicode character U+0009 ? ;
+	whitespace = { whitespace character } ;
+	non line break character = ? all visible characters ? - line break character ;
+	non whitespace character = non line break character - whitespace character ;
+	text = { non line break character } ;
+	comment = '#', [ text ] ;
+
 Parser Algorithm
 ----------------
 The following steps are followed by a player in order to parse an MKM file:
@@ -109,6 +136,6 @@ The following steps are followed by a player in order to parse an MKM file:
 16. If *line* starts with "mode", followed by one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, followed by "relative", followed by one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, followed by "base" or "manifest", set *relative path mode* accordingly, then jump back to the *step* labeled "start of line".
 17. If *line* starts with "base", skip one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, then resolve the remainder of *line*  relative to *manifest URL*, let *base path* be the result, then jump back to the *step* labeled "start of line".
 18. If *line* starts with "include", skip one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, then resolve the remainder of *line* relative to the URL specified by *relative path mode*, fetch the specified file, and parse it using these steps, providing the parser with *base*. If the file cannot be fetched, or fails to parse, ignore the line; do not abort these steps. If the file parses correctly, add the results to *additional file list* and *UUID map*; do not modify *base*, and replace existing values in *UUID map* if necessary. Jump jump back to the *step* labeled "start of line".
-19. If *line* starts with "segment", skip one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, then separate the remainder of *line* into a list of *tokens*, separated by one or more U+0020 SPACE or U+0009 CHARACTER TABULATION (tab) characters. If there is only one token, resolve it relative to the URL specified by *relative path mode* and add the result to *additional file list*. If there are two or more tokens, resolve the first relative to the URL specified by *relative path mode* and parse the second as a hexadecimal number representing a 16-byte UUID (the string need not be zero-padded to 32 characters). Ignore additional tokens (for forwards-compatibility). Add an item *UUID map*, with the parsed UUID as the key and the resolved URL as the value, then jump back to the *step* labeled "start of line".
+19. If *line* starts with "segment", skip one or more U+0020 SPACE and U+0009 CHARACTER TABULATION (tab) characters, then separate the remainder of *line* into a list of *tokens*, separated by one or more U+0020 SPACE or U+0009 CHARACTER TABULATION (tab) characters. If there is only one token, resolve it relative to the URL specified by *relative path mode* and add the result to *additional file list*. If there are two or more tokens, resolve the first relative to the URL specified by *relative path mode* and parse the second as a hexadecimal number representing a 16-byte UUID (the string need not be zero-padded to 32 characters). Ignore additional tokens. Add an item *UUID map*, with the parsed UUID as the key and the resolved URL as the value, then jump back to the *step* labeled "start of line".
 20. If none of the above conditions describe *line*, ignore it (for forwards-compatibility) and jump back to the *step* labeled "start of line".
 21. Return the *UUID map*, the *additional file list*, and the *base path*.
