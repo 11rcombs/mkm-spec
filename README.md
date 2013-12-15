@@ -43,13 +43,26 @@ file are always the ASCII string 'MATROSKA MANIFEST'.
 
 Matroska External Streams Manifest files are always encoded using UTF-8.
 
+Uses
+----
+MKM files can be used in either of two ways:
+
+1. As a playlist-like file, which specifies everything a player needs to know in order to play back the base file it specifies, and can be used as an entry in any regular playlist format
+2. As a metadata-only file, which specifies only information about URLs for ordered chapters, and cannot act as a standalone playlist entry, but can be used for multiple base files
+
+A file without a *base* specified can only be used in the latter case, but a file with a *base* specified can be used in either manner: if an MKM file is provided to a player which already knows where it's loading its base file from, the *base* is ignored.
+
+Index Behavior
+--------------
+When loading any Matroska file, a player may optionally attempt to read and parse a file named "index.mkm" from the same directory as the MKV. This file does not replace a manifest path provided by the user, but can be used in addition to one. This behavior is meant to allow any MKV file in the same directory to be opened normally by the user, while still allowing exa ternal chapter files to be found easily by the player.
+
 Format Example
 --------------
 
 	MATROSKA MANIFEST
 	base /absolute/path/to/index.mkv
-	segment http://example-cdn.net/fully/qualified/url.mkv C234EECF8B16558FA2F18530E318062D
-	segment ../path/relative/to/manifest.mkv 234C6AB6F5267EF79C65110CBF1536CA
+	segment http://example-cdn.net/fully/qualified/url.mkv	C234EECF8B16558FA2F18530E318062D
+	segment ../path/relative/to/manifest.mkv				234C6AB6F5267EF79C65110CBF1536CA
 	mode relative base
 	segment resources/opening.mkv # Opener for episodes 1-4
 	include ../../endings.mkm
