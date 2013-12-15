@@ -1,6 +1,7 @@
 NOTICE: This specification is an inital draft, and is currently subject to
 significant change at any time. Do not implement this format in a release
-version of any player until a finalized specification is ready.
+version of any player until a finalized specification is ready. Github issues
+and pull requests are welcome!
 
 Matroska External Streams Manifest Files
 ========================================
